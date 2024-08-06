@@ -1,0 +1,12 @@
+env_id: 'empty_dict'
+method: 'curiositydriven'
+#config_path: 'config/'
+config_path: 'min_red/config'
+algorithm_type: PPO  # SoftQ, PPO
+total_timesteps: 100000
+env_kwargs: 'empty_dict'
+vec_env_kwargs: 'empty_dict'
+is_atari: False
+play_model: False
+save_model: True
+wandb: False
