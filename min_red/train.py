@@ -1,4 +1,5 @@
 import gym
+import envs
 import numpy as np
 import time
 from stable_baselines3.common.vec_env import DummyVecEnv
@@ -9,11 +10,14 @@ from min_red.config.config import Config
 import argparse
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3 import PPO
+# from mixture.make_atari_stack_env import make_atari_stack_env
 from common.format_string import pretty
 import wandb
 import os
-
 from stable_baselines3.common.logger import configure
+# tmp_path = "tmp/test_log/"
+# new_logger = configure(tmp_path,["stdout","csv","tensorboard"])
+# import min_red.dqn.policies
 import torch
 
 torch.set_num_threads(8)
@@ -65,6 +69,11 @@ def train(config, log_path,logger):
             policy = 'MlpPolicy'
     else:
         pass
+        # from min_red.min_red_sac import MinRedSAC as Algorithm
+        # # from stable_baselines3.sac import MlpPolicy as Model
+        # from continuous_action_model import DiagGaussianPolicy as ActionModel
+        # ssprime_shape = (2*obs_shape[0],)
+        # policy = 'MlpPolicy'
 
     # create action model obs space by extending env's obs space
     ssprime_obs_space = gym.spaces.Box(low=env.observation_space.low.min(),
@@ -104,10 +113,21 @@ def train(config, log_path,logger):
     mf_model = ActionModel(observation_space=sa_obs_space,
                                action_space=env.action_space,
                                lr_schedule=lambda x: 3e-4).to(config.device)
+    # mf_model = MfModel(observation_space=s_obs_space,
+    #                        action_space=env.action_space,
+    #                        net_arch=[128, dict(vf=[256], pi=[16])],
+    #                        lr_schedule=lambda x: config.algorithm.policy.learning_rate).to(config.device)
 
     mf_trainer = MfModelTrainer(mf_model=mf_model,
                                 discrete=config.algorithm.discrete,
                                 new_logger=logger)
+    # if config.env_id == "unlockpickupar-v0" or config.env_id == "unlockpickupactionbonus-v0":
+    #     # curiosity_ppo_path = "log/unlockpickupactionbonus-v0_PPO_n-1_2023-03-15-15-55-10/model2000.zip"
+    #     curiosity_ppo_path = "log/unlockpickupactionbonus-v0_PPO_n-1_2023-04-13-10-14-21/model614400"
+    # elif config.env_id == "unlockpickupuncertaingoals-v0":
+    #     curiosity_ppo_path = "log/unlockpickupuncertaingoalsactionbonus-v0_PPO_n-1_2023-03-19-19-49-37/model409600"
+    # else:
+    #     curiosity_ppo_path = None
     if config.env_id in curiosity_policy_path_dict:
         curiosity_ppo_path = curiosity_policy_path_dict[config.env_id]
     else:
@@ -119,6 +139,7 @@ def train(config, log_path,logger):
         model.policy.load_state_dict(curiosity_ppo.policy.state_dict())
 
     model.set_logger(logger)
+    # model.set_logger(new_logger)
 
     model.learn(**config.algorithm.learn)
     print("Finished training...")
@@ -129,9 +150,11 @@ def train(config, log_path,logger):
 
         mf_model_path = os.path.join(log_path, "mfmodel")
         mf_model.save(mf_model_path)
+        # test_mf_model = ActionModel.load(mf_model_path)
 
         action_model_path = os.path.join(log_path, "actionmodel")
         action_model.save(action_model_path)
+        # test_action_model = ActionModel.load(action_model_path)
     if config.play_model:
         eval_policy(env, model)
 
@@ -152,6 +175,7 @@ if __name__ == '__main__':
     args, extra_args = parser.parse_known_args()
     config = get_config(args.f)
     config = bcast_config_vals(config)
+
     if config.wandb:
         run = wandb.init(config=config)
     else:
@@ -164,7 +188,9 @@ if __name__ == '__main__':
     else:
         n = -1
     experiment_name = "SF_Mask_"+ str(config.env_id) + '_' + str(config.method) + '_' + str(config.algorithm_type) + '_' + "n" + str(n) + '_' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+
     log_path = os.path.join("log", experiment_name)
     logger = configure(log_path, ["stdout", "csv", "tensorboard"])
+
     train(config,log_path,logger)
 

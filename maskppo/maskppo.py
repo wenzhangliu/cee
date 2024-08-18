@@ -1,11 +1,35 @@
 from stable_baselines3.ppo import PPO
+import warnings
+from typing import Any, Dict, Optional, Type, TypeVar, Union
+import os
 import numpy as np
 import torch as th
+from gym import spaces
+from torch.nn import functional as F
+
+from stable_baselines3.common.on_policy_algorithm import OnPolicyAlgorithm
 from stable_baselines3.common.policies import ActorCriticCnnPolicy, ActorCriticPolicy, BasePolicy, MultiInputActorCriticPolicy
+from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedule
+from stable_baselines3.common.utils import explained_variance, get_schedule_fn
+
+import sys
+import time
 from typing import Any, Dict, List, Optional, Tuple, Type, TypeVar, Union
+
 from stable_baselines3.common.policies import ActorCriticPolicy
 from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedule
-from common.classify_points import classify_points, find_redundant_positions
+from stable_baselines3.common.utils import obs_as_tensor, safe_mean
+from stable_baselines3.common.vec_env import VecEnv
+from stable_baselines3.common.logger import Figure
+
+from .heatmap import heatmap
+import torch
+import torch.nn.functional
+from common.classify_points import classify_points, find_redundant_positions,mini_actions_c
+
+import matplotlib.pyplot as plt
+from copy import deepcopy
+from collections import deque
 import types
 from stable_baselines3.common.distributions import (
     BernoulliDistribution,
@@ -18,6 +42,7 @@ from stable_baselines3.common.distributions import (
 )
 
 SelfPPO = TypeVar("SelfPPO", bound="PPO")
+# SelfOnPolicyAlgorithm = TypeVar("SelfOnPolicyAlgorithm", bound="OnPolicyAlgorithm")
 class Mfnet():
     def __init__(self,net):
         self.net = net
@@ -92,6 +117,19 @@ class MaskPPO(PPO):
         self.mask_threshold = mask_threshold
         self.policy.mask_threshold = mask_threshold
 
+        # def _predict(self, observation: th.Tensor, deterministic: bool = False) -> th.Tensor:
+        #     """
+        #     Get the action according to the policy for a given observation.
+        #     :param observation:
+        #     :param deterministic: Whether to use stochastic or deterministic actions
+        #     :return: Taken action according to the policy
+        #     """
+        #     original_dist = self.get_distribution(observation)
+        #
+        #     original_action = original_dist.get_actions(deterministic=deterministic)
+        #
+        #     return self.get_distribution(observation).get_actions(deterministic=deterministic)
+        #
         def forward(self, obs: th.Tensor, deterministic: bool = False) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
             """
             Forward pass in all the networks (actor and critic)
@@ -125,15 +163,33 @@ class MaskPPO(PPO):
                         mf_predicted_aa = test_mf_model.q_net(sa)
                         mean_mf_predicted_aa = th.mean(mf_predicted_aa, dim=0)
                         mf_predict_list.append(mean_mf_predicted_aa.tolist())
+                    # Similarity_Factor_Matrix
                     SF_Matrix = np.diag(np.array(mf_predict_list)) - np.array(mf_predict_list)
 
+
+                # ***********************NPM*******************************************
+                # classify actions and redundant_actions_list
+                #classes =classify_points(SF_Matrix,threshold=self.mask_threshold) #origin code
+                #minred_actions_list, redundant_actions_list = find_redundant_positions(classes)
+
+
+
+               # ***************************CEE**************************
                 N_matrix = np.diag(np.array(mf_predict_list))
                 classes,classes_actions = classify_points(SF_Matrix,threshold=self.mask_threshold)
                 minred_actions_list, redundant_actions_list = find_redundant_positions(classes, classes_actions, N_matrix)
+
+
+
+#----------------------cee-woc-------------------
+
+              #  N_matrix = np.diag(np.array(mf_predict_list))
+              #  minred_actions_list, redundant_actions_list = mini_actions_c(N_matrix)
+                #mask logits accoring to redundant_actions_list
                 distribution = self._get_action_dist_from_latent(latent_pi,redundant_actions_list=redundant_actions_list)
             else:
-
                 distribution = self._get_action_dist_from_latent(latent_pi)
+
             actions = distribution.get_actions(deterministic=deterministic)
             log_prob = distribution.log_prob(actions)
             actions = actions.reshape((-1, *self.action_space.shape))

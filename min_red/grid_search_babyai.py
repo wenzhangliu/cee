@@ -3,7 +3,7 @@ import time
 
 all_envs =  ['GoToRedBallGreyPositionBonus-v0','GoToR2PositionBonus-v0',"GoToDoorOpenR2PositionBonus-v0","GoToLocalPositionBonus-v0",
              "GoToPositionBonus-v0","KeyCorridorS5R2PositionBonus-v0","PutNextLocalPositionBonus-v0","GoToDoorOpenR2GreenBoxAddPositionBonus-v0","GoToDoorOpenR2GreenBoxAR-v0", "KeyCorridorS4R2AddPositionBonus-v0"]
-index= 2
+index= 6
 
 envs = [all_envs[index]]
 config_name = 'babyaiar'

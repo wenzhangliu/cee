@@ -4,10 +4,13 @@ envs = ['unlockpickupar-v0']
 config_name = 'unlockpickupar'
 alg = 'PPO'
 n_repeats = 1
-total_timesteps = 2000000
+total_timesteps = 500000
 log_interval = 1
 mask = ["True"]
-mask_threshold = 0.5
+
+
+mask_threshold = 0.5 # origin 1.0
+# n_steps = 512
 
 for trials in range(n_repeats):
     for mask_flag in mask:

@@ -484,31 +484,8 @@ register(
 
 
 
-#********************************以下都是*******************
-# add by jin
-KeyCorridorS5R3Kwargs = {"room_size": 5, "num_rows": 3}
-register(
-    id='KeyCorridorS5R3AR-v0',
-    entry_point='envs.babyai.KeyCorridor.KeyCorridorAR:KeyCorridorAR',
-    max_episode_steps=100000,
-    kwargs=KeyCorridorS5R3Kwargs
-)
 
-register(
-    id='KeyCorridorS5R3PositionBonus-v0',
-    entry_point='envs.babyai.KeyCorridor.KeyCorridorposbonus:KeyCorridorPositionBonus',
-    max_episode_steps=100000,
-    kwargs=KeyCorridorS5R3Kwargs
-)
 
-register(
-    id='KeyCorridorSS5R3AddPositionBonus-v0',
-    entry_point='envs.babyai.KeyCorridor.KeyCorridoraddposbonus:KeyCorridorAddPositionBonus',
-    max_episode_steps=100000,
-    kwargs=KeyCorridorS5R3Kwargs
-)
-
-# add by jin
 register(
     id='GoToDoorOpenR2RedBallAR-v0',
     entry_point='envs.babyai.GoToAR:GoToAR',

@@ -1,13 +1,15 @@
 import os
 import time
 envs = ['girdCL-v0']
-config_name = 'girdCL'
+config_name = 'gridCL'
 alg = 'PPO'
 methods = ['random']
 n_repeats = 1
 total_timesteps = 2000000
 log_interval = 10  # (episodes)
-n_actions_list = [4,6,8]
+#n_redundancies = 30
+n_actions_list = [7]
+# n_steps = 100
 
 for trials in range(n_repeats):
     for env in envs:

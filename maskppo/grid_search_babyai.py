@@ -9,16 +9,20 @@ all_envs =  ['GoToRedBallGreyAR-v0',"GoToDoorOpenR2AR-v0","GoToDoorOpenR2AddPosi
              "GoToR3GreyKeyAddPositionBonus-v0","GoToR3GreenBoxAddPositionBonus-v0","GoToR3RedBoxAddPositionBonus-v0",
              "PutNextLocalAR-v0",]
 
+
+#envs = ["GoToR3BlueKeyAddPositionBonus-v0", "GoToDoorOpenR2GreenBallAR-v0","GoToR3GreenBoxAddPositionBonus-v0","GoToR3PurpleBallAddPositionBonus-v0", "GoToR3GreyKeyAddPositionBonus-v0", "GoToR3RedBoxAddPositionBonus-v0",GoToDoorOpenR2AddPositionBonus-v0,"GoToDoorOpenR2GreyKeyAR-v0,PutNextLocalAR-v0,GoToDoorOpenR2RedBallAR-v0,GoToDoorOpenR2RedBallAddPositionBonus-v0,GoToDoorOpenR2BlueKeyAR-v0, GoToDoorOpenR2BlueBallAddPositionBonus-v0,GoToDoorOpenR2GreenBallAR-v0]
+
 envs = ["GoToDoorOpenR2GreenBallAR-v0"]
 
 config_name = 'babyaiar'
 
 alg = 'PPO'
 n_repeats = 1
-total_timesteps = 2000000
+total_timesteps = 1000000
 log_interval = 1
 mask = ["True"]
 mask_threshold = 0.5
+# n_steps = 512
 
 for trials in range(n_repeats):
     for mask_flag in mask:

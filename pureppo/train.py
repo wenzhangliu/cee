@@ -36,7 +36,7 @@ torch.set_num_threads(8)
 #             print(f"env member: {env.member}, R: {np.mean(traj_rewards)}")
 #             traj_rewards.append(0)
 
-# add by jin
+
 def eval_policy(env, model):
     obs = env.reset()
     traj_rewards = [0]
@@ -57,7 +57,7 @@ def eval_policy(env, model):
 
 
 
-def train(config, log_path,seed):
+def train(config, log_path):
     if config.is_atari:
         make_env = make_atari_stack_env
     else:
@@ -70,7 +70,7 @@ def train(config, log_path,seed):
     else:
         policy = 'MlpPolicy'
     # policy = 'MlpPolicy'
-    model = SavePPO(policy, env, tensorboard_log=log_path, **config.algorithm.policy,seed=seed)
+    model = SavePPO(policy, env, tensorboard_log=log_path, **config.algorithm.policy)
 
     model.learn(**config.algorithm.learn)
     print("Finished training...")
@@ -113,7 +113,7 @@ if __name__ == '__main__':
     config = bcast_config_vals(config)
     pretty(config)
 
-    config.play_model = True  # add by jin
+    config.play_model = True
 
     if 'n_actions' in config.env_kwargs.keys():
         n = config.env_kwargs.n_actions
@@ -138,5 +138,5 @@ if __name__ == '__main__':
                 name=experiment_name
                 # dir=str(log_path)
             )
-    train(config, log_path,seed = 5)
+    train(config, log_path)
     wandb.finish()

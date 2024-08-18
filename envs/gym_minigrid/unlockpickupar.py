@@ -12,6 +12,8 @@ from gym import spaces
 from .minigrid import OBJECT_TO_IDX, COLOR_TO_IDX, STATE_TO_IDX
 from gym.core import ObservationWrapper, Wrapper
 import numpy as np
+import pandas as pd
+from pureppo.heatmap import heatmap
 
 class unlockpickupar(UnlockPickup):
     def __init__(self, tile_size=8, seeds=[0], seed_idx=0):

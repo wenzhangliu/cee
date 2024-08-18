@@ -1,33 +1,37 @@
 # Reducing Action Space for Deep Reinforcement Learning via Causal Effect Estimation
 
-This work is.
 
-## Table of Contents
+## Requirements
+We test our method with a gpu that can run CUDA 12.0. Then, the simplest way to install all required dependencies is to create an anaconda environment by running:
+```
+conda env create -f conda_env.yml
+```
+After the installation ends you can activate your environment with:
+```
+source activate cee
+```
+## Instructions 
+### Pre-training: Training N-value network
+First, we need to train an N-value network. For example, in the Unlock Pickup environment, run:
+```
+cd cee
+python min_red/grid_search_minigrid.py
+```
 
-- [Introduction](#introduction)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
+### Phase 2: Conduct task training
+When the pre-training is complete, add the model to ***makppo/train.py/Env_mask_dict***```
+```
+python maskppo/grid_search_minigrid.py
+```
 
-## Introduction
+Both of two phases  will produce 'log' folder, where all the outputs are going to be stored. The data and lines can be observed in tensorboard.
 
-Provide a detailed description of your project. Explain what it does, its purpose, and any background information that is relevant.
 
-## Features
+```
+tensorboard --logdir log
+```
+Besides, Operation of the PurePPO algorithm:
 
-- List the main features of the project
-- Highlight any important or unique functionality
-
-## Installation
-
-Provide a step-by-step guide on how to install your project. Include any prerequisites that need to be installed.
-
-```bash
-# Clone the repository
-git clone https://github.com/your-username/your-repository.git
-
-# Navigate to the project directory
-cd your-repository
-
-# Install dependencies
-pip install -r requirements.txt
+```
+python pureppo/grid_search_minigrid.py
+```
