@@ -4,3 +4,7 @@
 **/.DS_Store
 .VSCodeCounter/
 **/__pycache__
+__pycache__
+log
+log_formal
+*.pyc
